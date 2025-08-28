@@ -708,7 +708,7 @@ echo "</div>";
 // 6. 'Info' Tab
 // ==========================
 
-echo '<div id="tab-info" class="tab-content active">';
+echo '<div id="tab-info" class="tab-content">';
 echo '<h1>Info</h1>';
 
 
@@ -731,7 +731,7 @@ echo "</div>";
 // 7. 'csf' Tab
 // ==========================
 
-echo '<div id="tab-csf" class="tab-content active">';
+echo '<div id="tab-csf" class="tab-content">';
 echo '<h1>csf</h1>';
 
 
@@ -754,7 +754,7 @@ echo "</div>";
 // 8. 'lfd' Tab
 // ==========================
 
-echo '<div id="tab-lfd" class="tab-content active">';
+echo '<div id="tab-lfd" class="tab-content">';
 echo '<h1>lfd</h1>';
 
 
@@ -777,7 +777,7 @@ echo "</div>";
 // 9. 'Other' Tab
 // ==========================
 
-echo '<div id="tab-other" class="tab-content active">';
+echo '<div id="tab-other" class="tab-content">';
 echo '<h1>Other</h1>';
 
 
@@ -810,7 +810,7 @@ echo "</div>";
 // 10. HTML Footer
 // ==========================
 
-echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">CSF</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
+echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">ConfigServer Security and Firewall</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
 
 
 

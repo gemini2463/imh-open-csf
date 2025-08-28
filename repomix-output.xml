@@ -813,7 +813,7 @@ echo "</div>";
 // 6. 'Info' Tab
 // ==========================
 
-echo '<div id="tab-info" class="tab-content active">';
+echo '<div id="tab-info" class="tab-content">';
 echo '<h1>Info</h1>';
 
 
@@ -836,7 +836,7 @@ echo "</div>";
 // 7. 'csf' Tab
 // ==========================
 
-echo '<div id="tab-csf" class="tab-content active">';
+echo '<div id="tab-csf" class="tab-content">';
 echo '<h1>csf</h1>';
 
 
@@ -859,7 +859,7 @@ echo "</div>";
 // 8. 'lfd' Tab
 // ==========================
 
-echo '<div id="tab-lfd" class="tab-content active">';
+echo '<div id="tab-lfd" class="tab-content">';
 echo '<h1>lfd</h1>';
 
 
@@ -882,7 +882,7 @@ echo "</div>";
 // 9. 'Other' Tab
 // ==========================
 
-echo '<div id="tab-other" class="tab-content active">';
+echo '<div id="tab-other" class="tab-content">';
 echo '<h1>Other</h1>';
 
 
@@ -915,7 +915,7 @@ echo "</div>";
 // 10. HTML Footer
 // ==========================
 
-echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">CSF</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
+echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">ConfigServer Security and Firewall</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
 
 
 
@@ -928,7 +928,7 @@ if ($isCPanelServer) {
 </file>
 
 <file path="imh-open-csf.php.sha256">
-1b7e681d56cd7e23cbc8e61059f77f3ddca9be58b2df3ac63af9a3c555fab630  imh-open-csf.php
+c902884d7fb249994b0da1a54d5c35bdab08625efc6a9ddcc41b5f5cdb827eae  imh-open-csf.php
 </file>
 
 <file path="imh-plugins.php">
@@ -1681,7 +1681,7 @@ echo "</div>";
 // 6. 'Info' Tab
 // ==========================
 
-echo '<div id="tab-info" class="tab-content active">';
+echo '<div id="tab-info" class="tab-content">';
 echo '<h1>Info</h1>';
 
 
@@ -1704,7 +1704,7 @@ echo "</div>";
 // 7. 'csf' Tab
 // ==========================
 
-echo '<div id="tab-csf" class="tab-content active">';
+echo '<div id="tab-csf" class="tab-content">';
 echo '<h1>csf</h1>';
 
 
@@ -1727,7 +1727,7 @@ echo "</div>";
 // 8. 'lfd' Tab
 // ==========================
 
-echo '<div id="tab-lfd" class="tab-content active">';
+echo '<div id="tab-lfd" class="tab-content">';
 echo '<h1>lfd</h1>';
 
 
@@ -1750,7 +1750,7 @@ echo "</div>";
 // 9. 'Other' Tab
 // ==========================
 
-echo '<div id="tab-other" class="tab-content active">';
+echo '<div id="tab-other" class="tab-content">';
 echo '<h1>Other</h1>';
 
 
@@ -1783,7 +1783,7 @@ echo "</div>";
 // 10. HTML Footer
 // ==========================
 
-echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">CSF</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
+echo '<div class="imh-footer-box"><img src="' . htmlspecialchars($img_src) . '" alt="open-csf" class="imh-footer-img" /><p><a href="https://configserver.com/configserver-security-and-firewall/" target="_blank">ConfigServer Security and Firewall</a> by Way to the Web Ltd.</p><p>Plugin by <a href="https://inmotionhosting.com" target="_blank">InMotion Hosting</a>.</p></div>';
 
 
 
@@ -1796,7 +1796,52 @@ if ($isCPanelServer) {
 </file>
 
 <file path="index.php.sha256">
-1b7e681d56cd7e23cbc8e61059f77f3ddca9be58b2df3ac63af9a3c555fab630  index.php
+c902884d7fb249994b0da1a54d5c35bdab08625efc6a9ddcc41b5f5cdb827eae  index.php
+</file>
+
+<file path="README.md">
+# OpenCSF (imh-open-csf), v0.0.1
+
+OpenCSF plugin for cPanel/WHM and CWP
+
+- cPanel/WHM path: `/usr/local/cpanel/whostmgr/docroot/cgi/imh-open-csf/index.php`
+- CWP path: `/usr/local/cwpsrv/htdocs/resources/admin/modules/imh-open-csf.php`
+
+# Installation
+
+- Run as the Root user: `curl -fsSL https://raw.githubusercontent.com/gemini2463/imh-open-csf/master/install.sh | sh`
+
+# Files
+
+## Shell installer
+
+- install.sh
+
+## Main script
+
+- index.php - Identical to `imh-open-csf.php`.
+- index.php.sha256 - `sha256sum index.php > index.php.sha256`
+- imh-open-csf.php - Identical to `index.php`.
+- imh-open-csf.php.sha256 - `sha256sum imh-open-csf.php > imh-open-csf.php.sha256`
+
+## Icon
+
+- imh-open-csf.png - [48x48 png image](https://api.docs.cpanel.net/guides/guide-to-whm-plugins/guide-to-whm-plugins-plugin-files/#icons)
+- imh-open-csf.png.sha256 - `sha256sum imh-open-csf.png > imh-open-csf.png.sha256`
+
+## cPanel conf
+
+- imh-open-csf.conf - [AppConfig Configuration File](https://api.docs.cpanel.net/guides/guide-to-whm-plugins/guide-to-whm-plugins-appconfig-configuration-file)
+- imh-open-csf.conf.sha256 - `sha256sum imh-open-csf.conf > imh-open-csf.conf.sha256`
+
+## CWP include
+
+- imh-plugins.php - [CWP include](https://wiki.centos-webpanel.com/how-to-build-a-cwp-module)
+- imh-plugins.php.sha256 - `sha256sum imh-plugins.php > imh-plugins.php.sha256`
+
+## sha256 one-liner
+
+- `for file in index.php imh-plugins.php imh-open-csf.conf imh-open-csf.php imh-open-csf.png; do sha256sum "$file" > "$file.sha256"; done`
 </file>
 
 <file path="install.sh">
@@ -2237,51 +2282,6 @@ main() {
 
 # Run main function
 main "$@"
-</file>
-
-<file path="README.md">
-# OpenCSF (imh-open-csf), v0.0.1
-
-OpenCSF plugin for cPanel/WHM and CWP
-
-- cPanel/WHM path: `/usr/local/cpanel/whostmgr/docroot/cgi/imh-open-csf/index.php`
-- CWP path: `/usr/local/cwpsrv/htdocs/resources/admin/modules/imh-open-csf.php`
-
-# Installation
-
-- Run as the Root user: `curl -fsSL https://raw.githubusercontent.com/gemini2463/imh-open-csf/master/install.sh | sh`
-
-# Files
-
-## Shell installer
-
-- install.sh
-
-## Main script
-
-- index.php - Identical to `imh-open-csf.php`.
-- index.php.sha256 - `sha256sum index.php > index.php.sha256`
-- imh-open-csf.php - Identical to `index.php`.
-- imh-open-csf.php.sha256 - `sha256sum imh-open-csf.php > imh-open-csf.php.sha256`
-
-## Icon
-
-- imh-open-csf.png - [48x48 png image](https://api.docs.cpanel.net/guides/guide-to-whm-plugins/guide-to-whm-plugins-plugin-files/#icons)
-- imh-open-csf.png.sha256 - `sha256sum imh-open-csf.png > imh-open-csf.png.sha256`
-
-## cPanel conf
-
-- imh-open-csf.conf - [AppConfig Configuration File](https://api.docs.cpanel.net/guides/guide-to-whm-plugins/guide-to-whm-plugins-appconfig-configuration-file)
-- imh-open-csf.conf.sha256 - `sha256sum imh-open-csf.conf > imh-open-csf.conf.sha256`
-
-## CWP include
-
-- imh-plugins.php - [CWP include](https://wiki.centos-webpanel.com/how-to-build-a-cwp-module)
-- imh-plugins.php.sha256 - `sha256sum imh-plugins.php > imh-plugins.php.sha256`
-
-## sha256 one-liner
-
-- `for file in index.php imh-plugins.php imh-open-csf.conf imh-open-csf.php imh-open-csf.png; do sha256sum "$file" > "$file.sha256"; done`
 </file>
 
 </files>
