@@ -84,7 +84,6 @@ if [[ "${1:-}" == "--uninstall" ]]; then
             echo "Removing CWP plugin files..."
             rm -f "/usr/local/cwpsrv/htdocs/resources/admin/modules/$SCRIPT_NAME.php"
             rm -f "/usr/local/cwpsrv/htdocs/admin/design/img/$SCRIPT_NAME.png"
-            rm -f "/usr/local/cwpsrv/htdocs/admin/design/js/$SCRIPT_NAME.js"
             # rm -f "/usr/local/cwpsrv/htdocs/resources/admin/include/imh-plugins.php"
             # Optional: remove line from 3rdparty.php
             # sed -i "/imh-plugins.php/d" "/usr/local/cwpsrv/htdocs/resources/admin/include/3rdparty.php" || true
@@ -233,7 +232,6 @@ install_cpanel() {
 
     download_file_with_checksum "$BASE_URL/index.php" "$TEMP_DIR/index.php" || error_exit "Failed to get script file"
     download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.conf" "$TEMP_DIR/$SCRIPT_NAME.conf" || error_exit "Failed to get .conf file"
-    download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.js" "$TEMP_DIR/$SCRIPT_NAME.js" || error_exit "Failed to get JS file"
     download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.png" "$TEMP_DIR/$SCRIPT_NAME.png" || error_exit "Failed to get PNG file"
 
     # Move files to final destination
@@ -241,8 +239,6 @@ install_cpanel() {
     copy_if_changed "$TEMP_DIR/index.php" "/usr/local/cpanel/whostmgr/docroot/cgi/$SCRIPT_NAME/index.php" || error_exit "Failed to copy index.php"
 
     copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.conf" "/usr/local/cpanel/whostmgr/docroot/cgi/$SCRIPT_NAME/$SCRIPT_NAME.conf" || error_exit "Failed to copy config"
-
-    copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.js" "/usr/local/cpanel/whostmgr/docroot/cgi/$SCRIPT_NAME/$SCRIPT_NAME.js" || error_exit "Failed to copy $SCRIPT_NAME.js"
 
     copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.png" "/usr/local/cpanel/whostmgr/docroot/cgi/$SCRIPT_NAME/$SCRIPT_NAME.png" || error_exit "Failed to copy image"
 
@@ -287,7 +283,6 @@ install_cwp() {
     download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.php" "$TEMP_DIR/$SCRIPT_NAME.php" || error_exit "Failed to get script file"
     download_file_with_checksum "$BASE_URL/imh-plugins.php" "$TEMP_DIR/imh-plugins.php" || error_exit "Failed to get include file"
     download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.png" "$TEMP_DIR/$SCRIPT_NAME.png" || error_exit "Failed to get PNG file"
-    download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.js" "$TEMP_DIR/$SCRIPT_NAME.js" || error_exit "Failed to get JS file"
 
     # Remove immutable attributes if they exist
     print_message "$BRIGHTBLUE" "Preparing directories..."
@@ -309,8 +304,6 @@ install_cwp() {
     # Move additional files
     copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.png" "/usr/local/cwpsrv/htdocs/admin/design/img/$SCRIPT_NAME.png" || print_message "$YELLOW" "Warning: Failed to copy image"
 
-    copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.js" "/usr/local/cwpsrv/htdocs/admin/design/js/$SCRIPT_NAME.js" || print_message "$YELLOW" "Warning: Failed to copy $SCRIPT_NAME.js"
-
     copy_if_changed "$TEMP_DIR/imh-plugins.php" "/usr/local/cwpsrv/htdocs/resources/admin/include/imh-plugins.php" || error_exit "Failed to copy include file"
 
     # Update 3rdparty.php
@@ -329,15 +322,13 @@ install_plain() {
 
     print_message "$BRIGHTBLUE" "Downloading files..."
     download_file_with_checksum "$BASE_URL/index.php" "$TEMP_DIR/index.php" || error_exit "Failed to get script file"
-    download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.js" "$TEMP_DIR/$SCRIPT_NAME.js" || error_exit "Failed to get JS file"
     download_file_with_checksum "$BASE_URL/$SCRIPT_NAME.png" "$TEMP_DIR/$SCRIPT_NAME.png" || error_exit "Failed to get PNG file"
 
     print_message "$BRIGHTBLUE" "Installing files..."
     copy_if_changed "$TEMP_DIR/index.php" "$dest/index.php"
-    copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.js" "$dest/$SCRIPT_NAME.js"
     copy_if_changed "$TEMP_DIR/$SCRIPT_NAME.png" "$dest/$SCRIPT_NAME.png"
     chmod 700 "$dest/index.php"
-    chmod 600 "$dest/$SCRIPT_NAME.js" "$dest/$SCRIPT_NAME.png"
+    chmod 600 "$dest/$SCRIPT_NAME.png"
 
     print_message "$GREEN" "Plain install complete. Files installed to $dest"
 }
