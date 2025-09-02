@@ -108,26 +108,6 @@ function imh_safe_cache_filename($tag)
     return IMH_SAR_CACHE_DIR . '/sar_' . preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $tag) . '.cache';
 }
 
-/**
- * Returns the sar sample interval in seconds (default 600).
- */
-function imh_guess_sar_interval()
-{
-    $cmd = "LANG=C sar -q 2>&1 | grep -E '^[0-9]{2}:[0-9]{2}:[0-9]{2}' | head -2 | awk '{print $1}'";
-    $out = safe_shell_exec($cmd, 3);
-    if (!is_string($out)) {
-        return 600; // fallback if shell_exec failed
-    }
-    $lines = array_filter(array_map('trim', explode("\n", $out)));
-    if (count($lines) < 2) return 600; // fallback
-    $t1 = strtotime($lines[0]);
-    $t2 = strtotime($lines[1]);
-    if ($t1 === false || $t2 === false) return 600;
-    $interval = $t2 - $t1;
-    if ($interval > 0 && $interval < 3600) return $interval;
-    return 600;
-}
-
 function imh_cached_shell_exec($tag, $command, $sar_interval)
 {
     $cache_file = imh_safe_cache_filename($tag);
@@ -227,7 +207,11 @@ function run_csf_action(string $action): string
     }
 
     // Path to csf.pl
-    $perl_csf = '/usr/local/cwpsrv/htdocs/resources/admin/modules/csf.pl';
+    if ($isCPanelServer) {
+        $perl_csf = '/etc/csf/csf.pl';
+    } else {
+        $perl_csf = '/usr/local/cwpsrv/htdocs/resources/admin/modules/csf.pl';
+    }
 
     // Build environment string from ALL POST params (action, ip, comment, etc.)
     $env = http_build_query($_POST);
@@ -1271,7 +1255,7 @@ if ($action_output) {
 echo "</div>";
 
 
-
+// Actions/descriptions for the 'Server Information' tab.
 
 echo '<div>';
 render_csf_tab('info', $CSF_ACTIONS, $CSRF_TOKEN);
