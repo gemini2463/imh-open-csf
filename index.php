@@ -217,19 +217,10 @@ function safe_shell_exec(string $command, int $timeout = 3): string
 
 function run_csf_action(string $action): string
 {
-    $allowed_actions = [
-        'status',
-        'restart',
-        'enable',
-        'disable',
-        'qallow',
-        'qdeny',
-        'qignore',
-        'kill',
-        'servercheck',
-        'readme'
-        // add more as you trust/test them
-    ];
+    global $CSF_ACTIONS;  // use the master actions array
+
+    // derive allowed actions from $CSF_ACTIONS keys
+    $allowed_actions = array_keys($CSF_ACTIONS);
 
     if (!in_array($action, $allowed_actions, true)) {
         return "Action not permitted";
@@ -238,8 +229,8 @@ function run_csf_action(string $action): string
     // Path to csf.pl
     $perl_csf = '/usr/local/cwpsrv/htdocs/resources/admin/modules/csf.pl';
 
-    // Build environment string like ajax_csfframe.php does
-    $env = http_build_query(['action' => $action]);
+    // Build environment string from ALL POST params (action, ip, comment, etc.)
+    $env = http_build_query($_POST);
 
     // Escape everything safely
     $cmd = escapeshellcmd($perl_csf) . ' ' . escapeshellarg($env);
@@ -281,11 +272,400 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_time'])) {
 }
 
 
+$CSF_ACTIONS = [
+    // --- INFO tab / Server Information group ---
+    'servercheck' => [
+        'label' => 'Check Server Security',
+        'desc'  => 'Perform a basic security, stability and settings check on the server.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'readme' => [
+        'label' => 'Firewall Information',
+        'desc'  => 'View the csf+lfd readme.txt file.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'logtail' => [
+        'label' => 'Watch System Logs',
+        'desc'  => 'Tail system logs defined in csf.syslogs.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'loggrep' => [
+        'label' => 'Search System Logs',
+        'desc'  => 'Search system logs (listed in csf.syslogs) with regex or keywords.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'viewports' => [
+        'label' => 'View Listening Ports',
+        'desc'  => 'List listening ports and the executables behind them.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'rblcheck' => [
+        'label' => 'RBL Check',
+        'desc'  => 'Check whether any of the server’s IPs are listed in RBLs.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'viewlogs' => [
+        'label' => 'View iptables Log',
+        'desc'  => 'View recent iptables log entries.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
 
+    // Optional extras if you want stats features
+    'chart' => [
+        'label' => 'lfd Statistics',
+        'desc'  => 'View cumulative blocking statistics for lfd.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
+    'systemstats' => [
+        'label' => 'System Statistics',
+        'desc'  => 'View load, CPU, memory, network, and disk statistics.',
+        'inputs' => [],
+        'tab'   => 'info',
+        'group' => 'Server Information'
+    ],
 
+    // Quick Actions
+    'qallow' => [
+        'label' => 'Quick Allow',
+        'desc'  => 'Allow an IP address through the firewall and add to csf.allow (permanent allow list).',
+        'inputs' => ['ip', 'comment'],
+        'tab'   => 'csf',
+        'group' => 'Quick Actions'
+    ],
+    'qdeny' => [
+        'label' => 'Quick Deny',
+        'desc'  => 'Block an IP address in the firewall and add to csf.deny (permanent deny list).',
+        'inputs' => ['ip', 'comment'],
+        'tab'   => 'csf',
+        'group' => 'Quick Actions'
+    ],
+    'qignore' => [
+        'label' => 'Quick Ignore',
+        'desc'  => 'Ignore an IP address from lfd, add to csf.ignore, and restart lfd.',
+        'inputs' => ['ip'],
+        'tab'   => 'csf',
+        'group' => 'Quick Actions'
+    ],
+    'kill' => [
+        'label' => 'Quick Unblock',
+        'desc'  => 'Remove an IP from both temporary and permanent blocks.',
+        'inputs' => ['ip'],
+        'tab'   => 'csf',
+        'group' => 'Quick Actions'
+    ],
+    // --- Firewall Configuration group ---
+    'conf' => [
+        'label' => 'Firewall Configuration',
+        'desc'  => 'Edit the main configuration file for csf and lfd (csf.conf).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'profiles' => [
+        'label' => 'Firewall Profiles',
+        'desc'  => 'Apply pre-configured csf.conf profiles, backup/restore csf.conf.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'status' => [
+        'label' => 'View iptables Rules',
+        'desc'  => 'Display the active iptables rules.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'grep' => [
+        'label' => 'Search for IP',
+        'desc'  => 'Search iptables and CSF config for an IP address.',
+        'inputs' => ['ip'],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'allow' => [
+        'label' => 'Firewall Allow IPs',
+        'desc'  => 'Edit the permanent allow list (csf.allow).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'deny' => [
+        'label' => 'Firewall Deny IPs',
+        'desc'  => 'Edit the permanent deny list (csf.deny).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'enable' => [
+        'label' => 'Firewall Enable',
+        'desc'  => 'Enable csf and lfd if previously disabled.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'disable' => [
+        'label' => 'Firewall Disable',
+        'desc'  => 'Completely disable csf and lfd.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'restart' => [
+        'label' => 'Firewall Restart',
+        'desc'  => 'Restart the csf iptables firewall.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'restartq' => [
+        'label' => 'Firewall Quick Restart',
+        'desc'  => 'Restart the csf firewall via lfd (faster).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'tempdeny' => [
+        'label' => 'Temporary Allow/Deny',
+        'desc'  => 'Temporarily block or allow an IP for a set duration and optional ports.',
+        'inputs' => ['ip', 'do', 'timeout', 'dur', 'ports', 'comment'],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'temp' => [
+        'label' => 'Temporary IP Entries',
+        'desc'  => 'View or remove currently active temporary allows/denies.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'sips' => [
+        'label' => 'Deny Server IPs',
+        'desc'  => 'Deny access to/from specific server IPs (csf.sips).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'denyf' => [
+        'label' => 'Flush all Blocks',
+        'desc'  => 'Remove all permanent and temporary blocks (csf.deny, temp bans).',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'redirect' => [
+        'label' => 'Firewall Redirect',
+        'desc'  => 'Edit csf.redirect to manage connection redirections.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
+    'fix' => [
+        'label' => 'Fix Common Problems',
+        'desc'  => 'Apply quick fixes (SPI, SMTP_BLOCK, etc.) for common issues.',
+        'inputs' => [],
+        'tab'   => 'csf',
+        'group' => 'Firewall Configuration'
+    ],
 
+    // --- LFD tab / Control group ---
+    'lfdstatus' => [
+        'label' => 'lfd Status',
+        'desc'  => 'Display the current status of the lfd service.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Control'
+    ],
+    'lfdrestart' => [
+        'label' => 'lfd Restart',
+        'desc'  => 'Restart the lfd service.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Control'
+    ],
+    'lfdstop' => [
+        'label' => 'lfd Stop',
+        'desc'  => 'Stop the lfd service.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Control'
+    ],
 
+    // --- LFD tab / Configuration Files group ---
+    'ignorefiles' => [
+        'label' => 'Edit Ignore Files',
+        'desc'  => 'Edit csf.ignore, csf.pignore, csf.fignore, etc.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'dirwatch' => [
+        'label' => 'Directory Watch',
+        'desc'  => 'Edit csf.dirwatch — files and dirs watched by lfd.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'dyndns' => [
+        'label' => 'Dynamic DNS',
+        'desc'  => 'Edit csf.dyndns — domains resolved/allowed via firewall.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'templates' => [
+        'label' => 'Email Alert Templates',
+        'desc'  => 'Edit email alert templates (alert.txt, sshalert.txt, etc.).',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'logfiles' => [
+        'label' => 'Log Scanner Files',
+        'desc'  => 'Edit csf.logfiles — list of log files scanned by lfd.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'blocklists' => [
+        'label' => 'Blocklists',
+        'desc'  => 'Edit csf.blocklists — configure external blocklists.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
+    'syslogusers' => [
+        'label' => 'Syslog Users',
+        'desc'  => 'Edit csf.syslogusers — allowed syslog/rsyslog users.',
+        'inputs' => [],
+        'tab'   => 'lfd',
+        'group' => 'Configuration Files'
+    ],
 
+    // --- OTHER tab / CloudFlare Firewall ---
+    'cloudflare' => [
+        'label' => 'CloudFlare',
+        'desc'  => 'Access CloudFlare firewall functionality.',
+        'inputs' => [],
+        'tab'   => 'other',
+        'group' => 'CloudFlare Firewall'
+    ],
+    'cloudflareedit' => [
+        'label' => 'CloudFlare Config',
+        'desc'  => 'Edit the CloudFlare configuration file (csf.cloudflare).',
+        'inputs' => [],
+        'tab'   => 'other',
+        'group' => 'CloudFlare Firewall'
+    ],
+
+    // --- OTHER tab / SMTP AUTH Restrictions ---
+    'smtpauth' => [
+        'label' => 'SMTP AUTH Restrictions',
+        'desc'  => 'Edit csf.smtpauth — allows SMTP AUTH to be advertised to listed IPs.',
+        'inputs' => [],
+        'tab'   => 'other',
+        'group' => 'SMTP AUTH Restrictions'
+    ],
+
+    // --- OTHER tab / Reseller Privileges ---
+    'reseller' => [
+        'label' => 'Reseller Privileges',
+        'desc'  => 'Edit csf.resellers — privileges for cPanel, DirectAdmin, or InterWorx resellers.',
+        'inputs' => [],
+        'tab'   => 'other',
+        'group' => 'Reseller Privileges'
+    ],
+
+    // --- OTHER tab / Extras ---
+    'csftest' => [
+        'label' => 'Test iptables',
+        'desc'  => 'Run csftest.pl to check that iptables has required modules.',
+        'inputs' => [],
+        'tab'   => 'other',
+        'group' => 'Extras'
+    ],
+];
+
+function render_csf_inputs(array $inputs)
+{
+    $html = '';
+    foreach ($inputs as $field) {
+        switch ($field) {
+            case 'ip':
+                $html .= '<input type="text" name="ip" placeholder="IP address" required><br>';
+                break;
+            case 'comment':
+                $html .= '<input type="text" name="comment" placeholder="Comment (optional)"><br>';
+                break;
+            case 'do':
+                $html .= '<select name="do"><option value="block">Block</option><option value="allow">Allow</option></select><br>';
+                break;
+            case 'timeout':
+                $html .= '<input type="number" name="timeout" min="1" value="60"> ';
+                break;
+            case 'dur':
+                $html .= '<select name="dur"><option>seconds</option><option selected>minutes</option><option>hours</option><option>days</option></select><br>';
+                break;
+            case 'ports':
+                $html .= '<input type="text" name="ports" value="*" placeholder="*,22,80,443"><br>';
+                break;
+        }
+    }
+    return $html;
+}
+
+function render_csf_tab(string $tab, array $actions, string $CSRF_TOKEN)
+{
+    // Group actions by group name
+    $grouped = [];
+    foreach ($actions as $action => $meta) {
+        if ($meta['tab'] === $tab) {
+            $grouped[$meta['group']][] = [$action, $meta];
+        }
+    }
+
+    // Render each group as its own table
+    foreach ($grouped as $groupName => $rows) {
+        echo '<div class="imh-box">';
+        echo '<h3>' . htmlspecialchars($groupName) . '</h3>';
+        echo '<div class="imh-table-responsive">';
+        echo '<table class="open-csf-tables">';
+        echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead><tbody>';
+
+        $alt = false;
+        foreach ($rows as [$action, $meta]) {
+            $rowClass = $alt ? ' class="imh-table-alt"' : '';
+            $alt = !$alt;
+
+            echo "<tr{$rowClass}><td>
+                <form method='post'>
+                    <input type='hidden' name='csrf_token' value='" . htmlspecialchars($CSRF_TOKEN) . "'>
+                    <input type='hidden' name='action' value='{$action}'>"
+                . render_csf_inputs($meta['inputs']) .
+                "<button type='submit' class='imh-btn imh-red-btn'>{$meta['label']}</button>
+                </form>
+              </td><td>{$meta['desc']}</td></tr>";
+        }
+
+        echo '</tbody></table>';
+        echo '</div></div>'; // close imh-box for group
+    }
+}
 
 
 // Find local time
@@ -667,13 +1047,14 @@ $csf_output = '';
 $action_output = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
+    $action = $_POST['action'] ?? '';
 
-    if ($action === 'start') {
-        $start_cmd = "systemctl start lfd.service";
-        $action_output = safe_shell_exec($start_cmd, 5);
-    } elseif (in_array($action, ['status', 'restart', 'enable', 'disable', 'qallow', 'qdeny', 'qignore', 'kill', 'servercheck', 'readme'], true)) {
+    if (isset($CSF_ACTIONS[$action])) {
+        // If action is in our master array, pass it to csf.pl
         $csf_output = run_csf_action($action);
+    } else {
+        // Optional: debugging fallback
+        $csf_output = "Unknown or unsupported action: " . htmlspecialchars($action);
     }
 }
 
@@ -690,9 +1071,12 @@ echo '<div class="tabs-nav" id="imh-tabs-nav">
 
 
 if ($csf_output) {
-    // Use ucfirst for a nice label (Status → "Status")
-    $tabLabel = ucfirst(htmlspecialchars($_POST['action']));
-    echo '<button type="button" class="active" data-tab="tab-csf-output" aria-label="' . $tabLabel . ' tab">' . $tabLabel . '</button>';
+    $action = $_POST['action'] ?? '';
+    $tabLabel = $CSF_ACTIONS[$action]['label'] ?? ucfirst($action);
+
+    echo '<button type="button" class="active" data-tab="tab-csf-output" aria-label="'
+        . htmlspecialchars($tabLabel) . ' tab">'
+        . htmlspecialchars($tabLabel) . '</button>';
 }
 
 echo '</div>';
@@ -866,8 +1250,8 @@ if ($is_running) {
     echo '
 <form method="post">
   <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-  <input type="hidden" name="form"       value="open_csf_control">
-  <input type="hidden" name="action"     value="start"> 
+  <input type="hidden" name="form" value="open_csf_control">
+  <input type="hidden" name="action" value="lfdrestart">
   <button type="submit">Start lfd</button>
 </form>
     ';
@@ -889,98 +1273,9 @@ echo "</div>";
 
 
 
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead>';
-echo '<tbody>';
-
-// Row: Check Server Security
-echo '<tr>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="servercheck">
-                <button type="submit" class="imh-btn imh-red-btn">Check Server Security*</button>
-            </form>
-        </td>
-        <td>Perform a basic security, stability and settings check on the server</td>
-      </tr>';
-
-// Row: Firewall Information
-echo '<tr class="imh-table-alt">
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="readme">
-                <button type="submit" class="imh-btn imh-red-btn">Firewall Information*</button>
-            </form>
-        </td>
-        <td>View the csf+lfd readme.txt file</td>
-      </tr>';
-
-// Row: Watch System Logs
-echo '<tr>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="logtail">
-                <button type="submit" class="imh-btn imh-red-btn">Watch System Logs</button>
-            </form>
-        </td>
-        <td>Watch (tail) various system log files (listed in csf.syslogs)</td>
-      </tr>';
-
-// Row: Search System Logs
-echo '<tr class="imh-table-alt">
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="loggrep">
-                <button type="submit" class="imh-btn imh-red-btn">Search System Logs</button>
-            </form>
-        </td>
-        <td>Search (grep) various system log files (listed in csf.syslogs)</td>
-      </tr>';
-
-// Row: View Listening Ports
-echo '<tr>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="viewports">
-                <button type="submit" class="imh-btn imh-red-btn">View Listening Ports</button>
-            </form>
-        </td>
-        <td>View ports on the server that have a running process behind them listening for external connections</td>
-      </tr>';
-
-// Row: RBL Check
-echo '<tr class="imh-table-alt">
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="rblcheck">
-                <button type="submit" class="imh-btn imh-red-btn">Check for IPs in RBLs</button>
-            </form>
-        </td>
-        <td>Check whether any of the server’s IP addresses are listed in RBLs</td>
-      </tr>';
-
-// Row: View iptables Log
-echo '<tr>
-        <td>
-            <form method="post">
-                <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-                <input type="hidden" name="action" value="viewlogs">
-                <button type="submit" class="imh-btn imh-red-btn">View iptables Log</button>
-            </form>
-        </td>
-        <td>View the last 100 iptables log lines</td>
-      </tr>';
-
-echo '</tbody>';
-echo '</table>';
-echo '</div>'; // .imh-table-responsive
+echo '<div>';
+render_csf_tab('info', $CSF_ACTIONS, $CSRF_TOKEN);
+echo '</div>';
 
 
 echo '</div>';
@@ -1007,281 +1302,8 @@ echo "</div>";
 // ==========================
 
 echo '<div id="tab-csf" class="tab-content">';
-
-
-// --- CSF Quick Actions Block ---
-echo '<div class="imh-box">';
-echo '<h3>Quick Actions</h3>';
-
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead>';
-echo '<tbody>';
-
-// Quick Allow
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="qallow">
-            <button type="submit" class="imh-btn imh-red-btn">Quick Allow*</button>
-        </form>
-    </td>
-    <td>Allow an IP address through the firewall and add to the allow file (csf.allow).</td>
-</tr>';
-
-// Quick Deny
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="qdeny">
-            <button type="submit" class="imh-btn imh-red-btn">Quick Deny*</button>
-        </form>
-    </td>
-    <td>Block an IP address in the firewall and add to the deny file (csf.deny).</td>
-</tr>';
-
-// Quick Ignore
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="qignore">
-            <button type="submit" class="imh-btn imh-red-btn">Quick Ignore*</button>
-        </form>
-    </td>
-    <td>Ignore an IP address from lfd, add to the ignore file (csf.ignore), and restart lfd.</td>
-</tr>';
-
-// Quick Unblock
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="kill">
-            <button type="submit" class="imh-btn imh-red-btn">Quick Unblock*</button>
-        </form>
-    </td>
-    <td>Remove an IP address from both temporary and permanent blocks.</td>
-</tr>';
-
-echo '</tbody>';
-echo '</table>';
-echo '</div>'; // .imh-table-responsive
-echo '</div>'; // .imh-box
-
-
-// --- CSF Configuration Block ---
-echo '<div class="imh-box">';
-echo '<h3>Firewall Configuration</h3>';
-
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead>';
-echo '<tbody>';
-
-// Firewall Configuration
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="conf">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Configuration</button>
-        </form>
-    </td>
-    <td>Edit the main configuration file for csf and lfd (csf.conf).</td>
-</tr>';
-
-// Firewall Profiles
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="profiles">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Profiles</button>
-        </form>
-    </td>
-    <td>Apply pre-configured csf.conf profiles and backup/restore csf.conf.</td>
-</tr>';
-
-// View iptables Rules
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="status">
-            <button type="submit" class="imh-btn imh-red-btn">View iptables Rules*</button>
-        </form>
-    </td>
-    <td>Display the active iptables rules.</td>
-</tr>';
-
-// Search for IP
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="grep">
-            <button type="submit" class="imh-btn imh-red-btn">Search for IP</button>
-        </form>
-    </td>
-    <td>Search iptables for an IP address.</td>
-</tr>';
-
-// Firewall Allow IPs
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="allow">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Allow IPs</button>
-        </form>
-    </td>
-    <td>Edit the csf.allow file (permanent allow list).</td>
-</tr>';
-
-// Firewall Deny IPs
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="deny">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Deny IPs</button>
-        </form>
-    </td>
-    <td>Edit the csf.deny file (permanent block list).</td>
-</tr>';
-
-// Firewall Enable
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="enable">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Enable*</button>
-        </form>
-    </td>
-    <td>Enable csf and lfd if previously disabled.</td>
-</tr>';
-
-// Firewall Disable
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="disable">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Disable*</button>
-        </form>
-    </td>
-    <td>Completely disable csf and lfd.</td>
-</tr>';
-
-// Firewall Restart
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="restart">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Restart*</button>
-        </form>
-    </td>
-    <td>Restart the csf iptables firewall.</td>
-</tr>';
-
-// Firewall Quick Restart
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="restartq">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Quick Restart</button>
-        </form>
-    </td>
-    <td>Restart the csf firewall via lfd (faster than full restart).</td>
-</tr>';
-
-// Temporary Allow/Deny
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="tempdeny">
-            <button type="submit" class="imh-btn imh-red-btn">Temporary Allow/Deny</button>
-        </form>
-    </td>
-    <td>Temporarily allow or block an IP address for a set time.</td>
-</tr>';
-
-// Temporary IP Entries
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="temp">
-            <button type="submit" class="imh-btn imh-red-btn">Temporary IP Entries</button>
-        </form>
-    </td>
-    <td>View or remove temporary allows/denies currently active.</td>
-</tr>';
-
-// Deny Server IPs
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="sips">
-            <button type="submit" class="imh-btn imh-red-btn">Deny Server IPs</button>
-        </form>
-    </td>
-    <td>Deny access to and from specific server IP addresses (csf.sips).</td>
-</tr>';
-
-// Flush all Blocks
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="denyf">
-            <button type="submit" class="imh-btn imh-red-btn">Flush all Blocks</button>
-        </form>
-    </td>
-    <td>Remove all permanent and temporary blocks (csf.deny, temp bans).</td>
-</tr>';
-
-// Firewall Redirect
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="redirect">
-            <button type="submit" class="imh-btn imh-red-btn">Firewall Redirect</button>
-        </form>
-    </td>
-    <td>Edit csf.redirect to manage connection redirections.</td>
-</tr>';
-
-// Fix Common Problems
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="fix">
-            <button type="submit" class="imh-btn imh-red-btn">Fix Common Problems</button>
-        </form>
-    </td>
-    <td>Apply quick fixes for common CSF issues (SPI, SMTP_BLOCK, etc.).</td>
-</tr>';
-
-echo '</tbody>';
-echo '</table>';
-echo '</div>'; // .imh-table-responsive
-echo '</div>'; // .imh-box
-
-
-
-//End of 'csf' tab content
-echo "</div>";
+render_csf_tab('csf', $CSF_ACTIONS, $CSRF_TOKEN);
+echo '</div>';
 
 
 
@@ -1296,160 +1318,8 @@ echo "</div>";
 // ==========================
 
 echo '<div id="tab-lfd" class="tab-content">';
-
-// --- lfd Control Block ---
-echo '<div class="imh-box">';
-echo '<h3>Control</h3>';
-
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead>';
-echo '<tbody>';
-
-// lfd Status
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="lfdstatus">
-            <button type="submit" class="imh-btn imh-red-btn">lfd Status</button>
-        </form>
-    </td>
-    <td>Display the current status of the lfd service</td>
-</tr>';
-
-// lfd Restart
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="lfdrestart">
-            <button type="submit" class="imh-btn imh-red-btn">lfd Restart</button>
-        </form>
-    </td>
-    <td>Restart the lfd service</td>
-</tr>';
-
-// lfd Stop
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="lfdstop">
-            <button type="submit" class="imh-btn imh-red-btn">lfd Stop</button>
-        </form>
-    </td>
-    <td>Stop the lfd service</td>
-</tr>';
-
-echo '</tbody>';
-echo '</table>';
-echo '</div>'; // .imh-table-responsive
-echo '</div>'; // .imh-box
-
-
-// --- lfd Configuration Files Block ---
-echo '<div class="imh-box">';
-echo '<h3>Configuration Files</h3>';
-
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">File</th><th>Description</th></tr></thead>';
-echo '<tbody>';
-
-// Ignore Files
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="ignorefiles">
-            <button type="submit" class="imh-btn imh-red-btn">Edit Ignore Files</button>
-        </form>
-    </td>
-    <td>Edit lfd ignore lists (csf.ignore, csf.pignore, csf.fignore, etc.)</td>
-</tr>';
-
-// Directory Watching
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="dirwatch">
-            <button type="submit" class="imh-btn imh-red-btn">Directory Watch</button>
-        </form>
-    </td>
-    <td>Edit the Directory File Watching list (csf.dirwatch)</td>
-</tr>';
-
-// Dynamic DNS
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="dyndns">
-            <button type="submit" class="imh-btn imh-red-btn">Dynamic DNS</button>
-        </form>
-    </td>
-    <td>Edit the Dynamic DNS list (csf.dyndns)</td>
-</tr>';
-
-// Email alert templates
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="emailalerts">
-            <button type="submit" class="imh-btn imh-red-btn">Email Alerts</button>
-        </form>
-    </td>
-    <td>Edit the Email Alert Templates (csf.emailalerts)</td>
-</tr>';
-
-// Log Scanner Files
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="logscanner">
-            <button type="submit" class="imh-btn imh-red-btn">Log Scanner</button>
-        </form>
-    </td>
-    <td>Edit the Log Scanner Files (csf.logscanner)</td>
-</tr>';
-
-// Blocklists
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="blocklists">
-            <button type="submit" class="imh-btn imh-red-btn">Blocklists</button>
-        </form>
-    </td>
-    <td>Edit the lfd Blocklists configuration (csf.blocklists)</td>
-</tr>';
-
-// Syslog Users
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="syslogusers">
-            <button type="submit" class="imh-btn imh-red-btn">Syslog Users</button>
-        </form>
-    </td>
-    <td>Edit syslog/rsyslog allowed users file (csf.syslogusers)</td>
-</tr>';
-
-echo '</tbody>';
-echo '</table>';
-echo '</div>'; // .imh-table-responsive
-echo '</div>'; // .imh-box
-
-
-
-//End of 'lfd' tab content
-echo "</div>";
+render_csf_tab('lfd', $CSF_ACTIONS, $CSRF_TOKEN);
+echo '</div>';
 
 
 
@@ -1464,113 +1334,8 @@ echo "</div>";
 // ==========================
 
 echo '<div id="tab-other" class="tab-content">';
-
-
-// --- CloudFlare Block ---
-echo '<div class="imh-box">';
-echo '<h3>CloudFlare Firewall</h3>';
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead><tbody>';
-
-// CloudFlare main
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="cloudflare">
-            <button type="submit" class="imh-btn imh-red-btn">CloudFlare</button>
-        </form>
-    </td>
-    <td>Access CloudFlare firewall functionality</td>
-</tr>';
-
-// CloudFlare config
-echo '<tr class="imh-table-alt">
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="cloudflareedit">
-            <button type="submit" class="imh-btn imh-red-btn">CloudFlare Config</button>
-        </form>
-    </td>
-    <td>Edit the CloudFlare configuration file (csf.cloudflare)</td>
-</tr>';
-
-echo '</tbody></table>';
-echo '</div></div>'; // end CloudFlare box
-
-
-// --- SMTP AUTH Restrictions ---
-echo '<div class="imh-box">';
-echo '<h3>cPanel SMTP AUTH Restrictions</h3>';
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead><tbody>';
-
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="smtpauth">
-            <button type="submit" class="imh-btn imh-red-btn">Edit SMTP AUTH</button>
-        </form>
-    </td>
-    <td>Edit the file that allows SMTP AUTH to be advertised to listed IP addresses (csf.smtpauth)</td>
-</tr>';
-
-echo '</tbody></table>';
-echo '</div></div>'; // end SMTP block
-
-
-// --- Resellers ---
-echo '<div class="imh-box">';
-echo '<h3>Reseller Privileges</h3>';
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead><tbody>';
-
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="reseller">
-            <button type="submit" class="imh-btn imh-red-btn">Edit Reseller Privs</button>
-        </form>
-    </td>
-    <td>Edit reseller privileges (csf.resellers) — applies to cPanel, DirectAdmin, or InterWorx</td>
-</tr>';
-
-echo '</tbody></table>';
-echo '</div></div>'; // end Resellers block
-
-
-// --- Extras ---
-echo '<div class="imh-box">';
-echo '<h3>Extras</h3>';
-echo '<div class="imh-table-responsive">';
-echo '<table class="open-csf-tables">';
-echo '<thead><tr><th style="width:25%;">Action</th><th>Description</th></tr></thead><tbody>';
-
-// csftest
-echo '<tr>
-    <td>
-        <form method="post">
-            <input type="hidden" name="csrf_token" value="' . htmlspecialchars($CSRF_TOKEN) . '">
-            <input type="hidden" name="action" value="csftest">
-            <button type="submit" class="imh-btn imh-red-btn">Test iptables</button>
-        </form>
-    </td>
-    <td>Check that iptables has the required modules to run csf (runs csftest.pl)</td>
-</tr>';
-
-echo '</tbody></table>';
-echo '</div></div>'; // end Extras block
-
-
-
-//End of 'Other' tab content
-echo "</div>";
+render_csf_tab('other', $CSF_ACTIONS, $CSRF_TOKEN);
+echo '</div>';
 
 
 
@@ -1582,12 +1347,57 @@ echo "</div>";
 // 8. 'User action' Tab
 // ==========================
 
+function scrub_csf_html($html)
+{
+    // Remove "content-type" header if present
+    $html = preg_replace('/^content-type:.*$/mi', '', $html);
+
+    // Remove any generic <h3>...</h3> blocks
+    $html = preg_replace('/<h3[^>]*>.*?<\/h3>/is', '', $html);
+
+    // Remove <html>, <head>, <body> wrappers
+    $html = preg_replace('/<\/?(html|head|body).*?>/i', '', $html);
+
+    // Remove loader div (and all its contents)
+    $html = preg_replace('/<div[^>]*id=["\']loader["\'][^>]*>.*?<\/div>/is', '', $html);
+
+    // Remove font-resize toolbar div
+    $html = preg_replace(
+        '/<div[^>]*class=["\']pull-right\s+btn-group["\'][^>]*>.*?<\/div>/is',
+        '',
+        $html
+    );
+
+    // Remove everything from start until end of the first <div class="panel panel-default">...</div>
+    $html = preg_replace('/^.*?<div\s+class=["\']panel\s+panel-default["\'][^>]*>.*?<\/div>/is', '', $html);
+
+    // Strip out ALL <script>...</script> and <style>...</style> blocks
+    $html = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $html);
+    $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html);
+
+    // Find the last closing </table> and truncate after it
+    $lastTablePos = strripos($html, '</table>');
+    if ($lastTablePos !== false) {
+        $html = substr($html, 0, $lastTablePos + strlen('</table>'));
+    }
+
+    // Remove footer junk: everything from the <hr><div><form...> marker through the end
+    $html = preg_replace('/<hr><div><form.*$/is', '', $html);
+
+    return trim($html);
+}
+
+
+
 if ($csf_output) {
-    $tabLabel = ucfirst(htmlspecialchars($_POST['action']));
+    $action = $_POST['action'] ?? '';
+    // Look up the friendly label in your master actions array
+    $tabLabel = $CSF_ACTIONS[$action]['label'] ?? ucfirst($action);
+
     echo '<div id="tab-csf-output" class="tab-content active">';
     echo '<div class="imh-box">';
-    echo '<h3>' . $tabLabel . ' Output</h3>';
-    echo $csf_output; // already HTML from Perl
+    echo '<h3>' . htmlspecialchars($tabLabel) . '</h3>';
+    echo scrub_csf_html($csf_output);
     echo '</div>';
     echo '</div>';
 }
