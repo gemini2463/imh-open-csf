@@ -207,6 +207,7 @@ function run_csf_action(string $action): string
     }
 
     // Path to csf.pl
+    global $isCPanelServer;
     if ($isCPanelServer) {
         $perl_csf = '/etc/csf/csf.pl';
     } else {
@@ -641,7 +642,7 @@ function render_csf_tab(string $tab, array $actions, string $CSRF_TOKEN)
                     <input type='hidden' name='csrf_token' value='" . htmlspecialchars($CSRF_TOKEN) . "'>
                     <input type='hidden' name='action' value='{$action}'>"
                 . render_csf_inputs($meta['inputs']) .
-                "<button type='submit' class='imh-btn imh-red-btn'>{$meta['label']}</button>
+                "<button type='submit' class='imh-btn'>{$meta['label']}</button>
                 </form>
               </td><td>{$meta['desc']}</td></tr>";
         }
@@ -719,17 +720,14 @@ if ($isCPanelServer) {
         padding: 5px 15px;
         border-radius: 6px;
         font-weight: bold;
+        background: #6c67d4ff;
+        color: #e4fffbff;
+        border-color: #e4fffbff;
     }
 
     .imh-btn:hover {
-        background: #9e181fff;
-        color: #ca9e9eff;
-    }
-
-    .imh-red-btn {
-        background: #C52227;
-        color: #fff;
-        border: none;
+        background: #5a53bdff;
+        color: #befff5ff;
     }
 
     .imh-piechart-col {

@@ -836,6 +836,7 @@ function run_csf_action(string $action): string
     }
 
     // Path to csf.pl
+    global $isCPanelServer;
     if ($isCPanelServer) {
         $perl_csf = '/etc/csf/csf.pl';
     } else {
@@ -1270,7 +1271,7 @@ function render_csf_tab(string $tab, array $actions, string $CSRF_TOKEN)
                     <input type='hidden' name='csrf_token' value='" . htmlspecialchars($CSRF_TOKEN) . "'>
                     <input type='hidden' name='action' value='{$action}'>"
                 . render_csf_inputs($meta['inputs']) .
-                "<button type='submit' class='imh-btn imh-red-btn'>{$meta['label']}</button>
+                "<button type='submit' class='imh-btn'>{$meta['label']}</button>
                 </form>
               </td><td>{$meta['desc']}</td></tr>";
         }
@@ -1348,17 +1349,14 @@ if ($isCPanelServer) {
         padding: 5px 15px;
         border-radius: 6px;
         font-weight: bold;
+        background: #6c67d4ff;
+        color: #e4fffbff;
+        border-color: #e4fffbff;
     }
 
     .imh-btn:hover {
-        background: #9e181fff;
-        color: #ca9e9eff;
-    }
-
-    .imh-red-btn {
-        background: #C52227;
-        color: #fff;
-        border: none;
+        background: #5a53bdff;
+        color: #befff5ff;
     }
 
     .imh-piechart-col {
@@ -2040,7 +2038,7 @@ if ($isCPanelServer) {
 </file>
 
 <file path="imh-open-csf.php.sha256">
-6ae710364da0350820f9200f5df9679015ab0305fb888de3d117dd61f18ff6b9  imh-open-csf.php
+7f5d7484720a89e4e977bf3b89b81164d8a0c86ae1a672c6bf37fd007eb89fcf  imh-open-csf.php
 </file>
 
 <file path="index.php">
@@ -2253,6 +2251,7 @@ function run_csf_action(string $action): string
     }
 
     // Path to csf.pl
+    global $isCPanelServer;
     if ($isCPanelServer) {
         $perl_csf = '/etc/csf/csf.pl';
     } else {
@@ -2687,7 +2686,7 @@ function render_csf_tab(string $tab, array $actions, string $CSRF_TOKEN)
                     <input type='hidden' name='csrf_token' value='" . htmlspecialchars($CSRF_TOKEN) . "'>
                     <input type='hidden' name='action' value='{$action}'>"
                 . render_csf_inputs($meta['inputs']) .
-                "<button type='submit' class='imh-btn imh-red-btn'>{$meta['label']}</button>
+                "<button type='submit' class='imh-btn'>{$meta['label']}</button>
                 </form>
               </td><td>{$meta['desc']}</td></tr>";
         }
@@ -2765,17 +2764,14 @@ if ($isCPanelServer) {
         padding: 5px 15px;
         border-radius: 6px;
         font-weight: bold;
+        background: #6c67d4ff;
+        color: #e4fffbff;
+        border-color: #e4fffbff;
     }
 
     .imh-btn:hover {
-        background: #9e181fff;
-        color: #ca9e9eff;
-    }
-
-    .imh-red-btn {
-        background: #C52227;
-        color: #fff;
-        border: none;
+        background: #5a53bdff;
+        color: #befff5ff;
     }
 
     .imh-piechart-col {
@@ -3457,7 +3453,7 @@ if ($isCPanelServer) {
 </file>
 
 <file path="index.php.sha256">
-6ae710364da0350820f9200f5df9679015ab0305fb888de3d117dd61f18ff6b9  index.php
+7f5d7484720a89e4e977bf3b89b81164d8a0c86ae1a672c6bf37fd007eb89fcf  index.php
 </file>
 
 </files>
